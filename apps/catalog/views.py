@@ -22,6 +22,16 @@ from apps.catalog.permissions import IsSuperAdmin, IsOwnProduct
 from apps.accounts.permissions import IsSeller, IsSellerOnly
 
 
+
+class PublicCategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    """Public viewset for listing and retrieving categories."""
+    queryset = Category.objects.filter(is_active=True)
+    serializer_class = CategorySerializer
+    permission_classes = [AllowAny]
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['name']
+    ordering_fields = ['name', 'created_at']
+
 class AdminCategoryViewSet(viewsets.ModelViewSet):
     """Admin viewset for managing product categories."""
     queryset = Category.objects.all()

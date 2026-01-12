@@ -3,15 +3,17 @@ from rest_framework.routers import SimpleRouter
 from rest_framework_nested import routers
 
 from apps.catalog.views import (
-    AdminCategoryViewSet, AdminProductTypeViewSet, AdminAttributeViewSet,
+    AdminCategoryViewSet, PublicCategoryViewSet, AdminProductTypeViewSet, AdminAttributeViewSet,
     AdminAttributeOptionViewSet, AdminTypeAttributeRuleViewSet,
     ProductTypeSchemaView, SellerProductViewSet, SellerProductImageViewSet,
     SellerProductAttributeValueViewSet, PublicProductViewSet
 )
 
+
 # Public routes - no authentication
 public_router = SimpleRouter()
 public_router.register(r'products', PublicProductViewSet, basename='product')
+public_router.register(r'categories', PublicCategoryViewSet, basename='category')
 
 # Admin routes - use SimpleRouter to avoid format suffix patterns conflict
 router = SimpleRouter()

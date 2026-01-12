@@ -56,6 +56,12 @@ INSTALLED_APPS = [
     'apps.returns',
     'apps.reviews',
     'apps.promotions',
+    'apps.wishlist',
+    'apps.cart',
+    'apps.testimonial',
+    'apps.brand',
+    'apps.dashboard',
+    'apps.userprofile',
 ]
 
 MIDDLEWARE = [
@@ -70,7 +76,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'marketplace.urls'
+ROOT_URLCONF = 'african_back_end.urls'
 
 TEMPLATES = [
     {

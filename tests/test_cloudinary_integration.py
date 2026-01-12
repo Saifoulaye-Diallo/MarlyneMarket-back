@@ -312,7 +312,7 @@ class CloudinaryConfigurationTestCase(TestCase):
     @patch.dict('os.environ', {'CLOUDINARY_URL': 'cloudinary://key:secret@cloud'})
     def test_cloudinary_url_parsing(self):
         """Test Cloudinary URL parsing from environment."""
-        from marketplace.settings.base import cloudinary
+        from african_back_end.settings.base import cloudinary
         
         # This test verifies that cloudinary configuration loads properly
         self.assertIsNotNone(cloudinary.config())

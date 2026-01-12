@@ -1,6 +1,6 @@
 import os
 import django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marketplace.settings.dev')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'african_back_end.settings.dev')
 django.setup()
 
 import cloudinary

@@ -8,7 +8,7 @@ from drf_spectacular.views import (
     SpectacularRedocView,
 )
 from rest_framework.routers import SimpleRouter
-from apps.catalog.views import PublicProductViewSet, SellerProductsOnlyViewSet
+from apps.catalog.views import PublicProductViewSet, PublicCategoryViewSet, SellerProductsOnlyViewSet
 from apps.accounts.views import (
     AdminUserListView, AdminSellerListView, AdminProductListView,
     CustomerProfileDetailView, SellerProfileDetailView
@@ -19,6 +19,7 @@ from apps.orders.views import SellerOrderListView, SellerOrderItemListView, Sell
 # Public routes
 public_router = SimpleRouter()
 public_router.register(r'products', PublicProductViewSet, basename='product')
+public_router.register(r'categories', PublicCategoryViewSet, basename='category')
 
 # Seller routes (reuse the same ProductViewSet)
 seller_router = SimpleRouter()
@@ -68,6 +69,12 @@ urlpatterns = [
     path('api/returns/', include('apps.returns.urls')),
     path('api/reviews/', include('apps.reviews.urls')),
     path('api/promotions/', include('apps.promotions.urls')),
+    path('api/wishlist/', include('apps.wishlist.urls')),
+    path('api/cart/', include('apps.cart.urls')),
+    path('api/testimonial/', include('apps.testimonial.urls')),
+    path('api/brand/', include('apps.brand.urls')),
+    path('api/dashboard/', include('apps.dashboard.urls')),
+    path('api/userprofile/', include('apps.userprofile.urls')),
 ]
 
 if settings.DEBUG:

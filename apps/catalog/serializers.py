@@ -330,9 +330,16 @@ class ProductListSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 'seller_name', 'name', 'category_name', 'product_type',
-            'price', 'stock', 'status', 'primary_image', 'created_at'
+            'price', 'discount_price', 'discount_percentage', 'cost_price',
+            'stock', 'minimum_stock', 'status', 'condition',
+            'shipping_type', 'shipping_weight', 'shipping_cost',
+            'sku', 'upc_ean', 'average_rating', 'total_reviews', 'total_sold',
+            'is_featured', 'is_on_sale', 'is_digital',
+            'short_description', 'description',
+            'meta_title', 'meta_description', 'meta_keywords',
+            'created_at', 'published_at', 'expires_at', 'primary_image'
         ]
-        read_only_fields = ['id', 'created_at']
+        read_only_fields = ['id', 'created_at', 'published_at', 'expires_at']
 
     def get_primary_image(self, obj):
         primary = obj.images.filter(is_primary=True).first()
