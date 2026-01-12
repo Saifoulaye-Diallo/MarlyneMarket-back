@@ -1,0 +1,763 @@
+{
+  "info": {
+    "name": "Marketplace API - Tests Complets",
+    "description": "Collection complète avec tous les tests et variables automatiques",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. AUTHENTIFICATION",
+      "item": [
+        {
+          "name": "Inscription Client",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    console.log('Client registration response:', JSON.stringify(jsonData, null, 2));",
+                  "    ",
+                  "    // Capture user details",
+                  "    if (jsonData.user && jsonData.user.id) {",
+                              "if (pm.response.code === 200) {",
+                              "    var jsonData = pm.response.json();",
+                              "    console.log('Seller login successful');",
+                              "    // Update tokens",
+                              "    if (jsonData.access && typeof jsonData.access === 'string' && jsonData.access.length > 0) {",
+                              "        pm.collectionVariables.set('seller_token', jsonData.access);",
+                              "        console.log('Seller token set:', jsonData.access);",
+                              "    } else {",
+                              "        pm.collectionVariables.unset('seller_token');",
+                              "        console.log('No seller token found in response!');",
+                              "    }",
+                              "    // Capture seller profile info if available",
+                              "    if (jsonData.user && jsonData.user.seller_profile) {",
+                              "        pm.collectionVariables.set('seller_profile_id', jsonData.user.seller_profile.id);",
+                              "        console.log('Seller profile ID captured:', jsonData.user.seller_profile.id);",
+                              "    }",
+                              "} else {",
+                              "    pm.collectionVariables.unset('seller_token');",
+                              "    console.log('Seller login failed:', pm.response.status, pm.response.text());",
+                              "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"johndoe{{$timestamp}}\",\n    \"email\": \"client{{$timestamp}}@test.com\",\n    \"password\": \"Test123!\",\n    \"password_confirm\": \"Test123!\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"role\": \"customer\",\n    \"phone_number\": \"+33612345678\",\n    \"date_of_birth\": \"1990-01-01\",\n    \"address\": \"123 Rue de la Paix, Paris\",\n    \"preferred_language\": \"fr\",\n    \"preferred_currency\": \"EUR\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/register/"
+          }
+        },
+        {
+          "name": "Inscription Vendeur",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    console.log('Seller registration response:', JSON.stringify(jsonData, null, 2));",
+                  "    ",
+                  "    // Capture seller details",
+                  "    if (jsonData.user && jsonData.user.id) {",
+                  "        pm.collectionVariables.set('seller_id', jsonData.user.id);",
+                  "        pm.collectionVariables.set('seller_username', jsonData.user.username);",
+                  "        console.log('Seller ID captured:', jsonData.user.id);",
+                  "        console.log('Seller username captured:', jsonData.user.username);",
+                  "        ",
+                  "        // Capture seller profile if available",
+                  "        if (jsonData.user.seller_profile) {",
+                  "            pm.collectionVariables.set('seller_profile_id', jsonData.user.seller_profile.id);",
+                  "            console.log('Seller profile ID captured:', jsonData.user.seller_profile.id);",
+                  "        }",
+                  "    }",
+                  "    ",
+                  "    // Capture tokens",
+                  "    if (jsonData.access) {",
+                  "        pm.collectionVariables.set('seller_token', jsonData.access);",
+                  "        console.log('Seller token captured');",
+                  "    }",
+                  "} else {",
+                  "    console.log('Seller registration failed:', pm.response.status, pm.response.text());",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"seller{{$timestamp}}\",\n    \"email\": \"seller{{$timestamp}}@test.com\",\n    \"password\": \"Test123!\",\n    \"password_confirm\": \"Test123!\",\n    \"first_name\": \"Marie\",\n    \"last_name\": \"Seller\",\n    \"phone_number\": \"+33612345679\",\n    \"shop_name\": \"Ma Boutique {{$timestamp}}\",\n    \"shop_description\": \"Boutique spécialisée en électronique\",\n    \"business_type\": \"individual\",\n    \"country\": \"France\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/register/seller/"
+          }
+        },
+        {
+          "name": "Login Client",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    console.log('Client login successful');",
+                  "    ",
+                  "    // Update tokens",
+                  "    if (jsonData.access) {",
+                  "        pm.collectionVariables.set('client_token', jsonData.access);",
+                  "        console.log('Client token refreshed');",
+                  "    }",
+                  "    ",
+                  "    if (jsonData.refresh) {",
+                  "        pm.collectionVariables.set('refresh_token', jsonData.refresh);",
+                  "        console.log('Refresh token updated');",
+                  "    }",
+                  "    ",
+                  "    // Capture user info if available",
+                  "    if (jsonData.user) {",
+                  "        if (jsonData.user.id) {",
+                  "            pm.collectionVariables.set('user_id', jsonData.user.id);",
+                  "        }",
+                  "        if (jsonData.user.customer_profile) {",
+                  "            pm.collectionVariables.set('customer_profile_id', jsonData.user.customer_profile.id);",
+                  "        }",
+                  "    }",
+                  "} else {",
+                  "    console.log('Client login failed:', pm.response.status, pm.response.text());",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"{{client_username}}\",\n    \"password\": \"Test123!\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/login/"
+          }
+        },
+        {
+          "name": "Login Vendeur",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    console.log('Seller login successful');",
+                  "    ",
+                  "    // Update tokens",
+                  "    if (jsonData.access) {",
+                  "        pm.collectionVariables.set('seller_token', jsonData.access);",
+                  "        console.log('Seller token refreshed');",
+                  "    }",
+                  "    ",
+                  "    // Capture seller profile info if available",
+                  "    if (jsonData.user && jsonData.user.seller_profile) {",
+                  "        pm.collectionVariables.set('seller_profile_id', jsonData.user.seller_profile.id);",
+                  "        console.log('Seller profile ID captured:', jsonData.user.seller_profile.id);",
+                  "    }",
+                  "} else {",
+                  "    console.log('Seller login failed:', pm.response.status, pm.response.text());",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"{{seller_username}}\",\n    \"password\": \"Test123!\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/login/"
+          }
+        },
+        {
+          "name": "Profil Utilisateur (Me)",
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "exec": [
+                    "// Always set Authorization header dynamically with latest client_token",
+                    "if (pm.collectionVariables.get('client_token')) {",
+                    "    pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('client_token') });",
+                    "}"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{client_token}}"
+                }
+              ],
+              "url": "{{base_url}}/api/auth/me/"
+            }
+        }
+      ]
+    },
+    {
+      "name": "2. PRODUITS",
+      "item": [
+        {
+          "name": "Liste Publique des Produits",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/products/"
+          }
+        },
+        {
+          "name": "Créer un Produit (Vendeur)",
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "exec": [
+                    "// Always set Authorization header dynamically with latest seller_token (SELLER ENDPOINT)",
+                    "const token = pm.collectionVariables.get('seller_token');",
+                    "if (token) { pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + token }); }"
+                  ]
+                }
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Laptop Test {{$timestamp}}\",\n    \"description\": \"Ordinateur portable de test\",\n    \"price\": \"999.99\",\n    \"stock\": 5,\n    \"category\": 1,\n    \"product_type\": 1,\n    \"brand\": \"TestBrand\",\n    \"model\": \"Test Model\",\n    \"color\": \"Silver\",\n    \"weight\": \"2.0\",\n    \"dimensions\": \"30x20x2 cm\",\n    \"warranty_period\": 12,\n    \"seller\": {{seller_id}}\n}"
+            },
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('product_id', jsonData.id);",
+                  "    console.log('Product created:', jsonData.id);",
+                  "}"
+                ]
+              }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{seller_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Laptop Test {{$timestamp}}\",\n    \"description\": \"Ordinateur portable de test\",\n    \"price\": \"999.99\",\n    \"stock\": 5,\n    \"category\": 1,\n    \"product_type\": 1,\n    \"brand\": \"TestBrand\",\n    \"model\": \"Test Model\",\n    \"color\": \"Silver\",\n    \"weight\": \"2.0\",\n    \"dimensions\": \"30x20x2 cm\",\n    \"warranty_period\": 12\n}"
+            },
+            "url": "{{base_url}}/api/seller/products/"
+          }
+        },
+        {
+          "name": "Détails d'un Produit",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/products/{{product_id}}/"
+          }
+        },
+        {
+          "name": "Lister Mes Produits (Vendeur)",
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "exec": [
+                    "// Always set Authorization header dynamically with latest seller_token (SELLER ENDPOINT)",
+                    "const token = pm.collectionVariables.get('seller_token');",
+                    "if (token) { pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + token }); }"
+                  ]
+                }
+              }
+            ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{seller_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/seller/products/"
+          }
+    },
+    {
+      "name": "3. COMMANDES",
+      "item": [
+        {
+          "name": "Créer une Commande (Checkout)",
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "exec": [
+                    "// Always set Authorization header dynamically with latest client_token",
+                    "if (pm.collectionVariables.get('client_token')) {",
+                    "    pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('client_token') });",
+                    "}"
+                  ]
+                }
+              }
+            ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('order_id', jsonData.id);",
+                  "    console.log('Order created:', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n    \\\"items\\\": [\\n        {\\n            \\\"product_id\\\": {{product_id}},\\n            \\\"quantity\\\": 1\\n        }\\n    ],\\n    \\\"shipping_address\\\": {\\n        \\\"full_name\\\": \\\"John Doe\\\",\\n        \\\"phone_number\\\": \\\"+33612345678\\\",\\n        \\\"email_address\\\": \\\"john.doe@email.com\\\",\\n        \\\"street_address\\\": \\\"123 Rue de Paris\\\",\\n        \\\"building_apartment\\\": \\\"Appartement 4B\\\",\\n        \\\"city\\\": \\\"Paris\\\",\\n        \\\"state_province\\\": \\\"Île-de-France\\\",\\n        \\\"postal_code\\\": \\\"75001\\\",\\n        \\\"country\\\": \\\"France\\\",\\n        \\\"label\\\": \\\"home\\\"\\n    },\\n    \\\"currency\\\": \\\"EUR\\\"\\n}"
+            },
+            "url": "{{base_url}}/api/orders/checkout/"
+          }
+        },
+        {
+          "name": "Mes Commandes (Client)",
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "exec": [
+                    "// Always set Authorization header dynamically with latest client_token",
+                    "if (pm.collectionVariables.get('client_token')) {",
+                    "    pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('client_token') });",
+                    "}"
+                  ]
+                }
+              }
+            ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/orders/"
+          }
+        },
+        {
+          "name": "Commandes du Vendeur",
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "exec": [
+                    "// Always set Authorization header dynamically with latest seller_token (SELLER ENDPOINT)",
+                    "const token = pm.collectionVariables.get('seller_token');",
+                    "if (token) { pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + token }); }"
+                  ]
+                }
+              }
+            ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{seller_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/seller/orders/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. ADRESSES CLIENT",
+      "item": [
+        {
+          "name": "Créer une Adresse",
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "exec": [
+                    "// Always set Authorization header dynamically with latest client_token",
+                    "if (pm.collectionVariables.get('client_token')) {",
+                    "    pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('client_token') });",
+                    "}"
+                  ]
+                }
+              }
+            ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('address_id', jsonData.id);",
+                  "    console.log('Address created:', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n    \\\"label\\\": \\\"home\\\",\\n    \\\"full_name\\\": \\\"John Doe\\\",\\n    \\\"phone_number\\\": \\\"+33612345678\\\",\\n    \\\"email_address\\\": \\\"john.doe@email.com\\\",\\n    \\\"street_address\\\": \\\"123 Rue de la Paix\\\",\\n    \\\"building_apartment\\\": \\\"Apt 4B\\\",\\n    \\\"city\\\": \\\"Paris\\\",\\n    \\\"state_province\\\": \\\"Île-de-France\\\",\\n    \\\"postal_code\\\": \\\"75001\\\",\\n    \\\"country\\\": \\\"France\\\",\\n    \\\"is_default_shipping\\\": true\\n}"
+            },
+            "url": "{{base_url}}/api/customers/addresses/"
+          }
+        },
+        {
+          "name": "Mes Adresses",
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "exec": [
+                    "// Always set Authorization header dynamically with latest client_token",
+                    "if (pm.collectionVariables.get('client_token')) {",
+                    "    pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('client_token') });",
+                    "}"
+                  ]
+                }
+              }
+            ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/customers/addresses/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. AVIS",
+      "item": [
+        {
+          "name": "Créer un Avis",
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "exec": [
+                    "// Always set Authorization header dynamically with latest client_token",
+                    "if (pm.collectionVariables.get('client_token')) {",
+                    "    pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('client_token') });",
+                    "}"
+                  ]
+                }
+              }
+            ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('review_id', jsonData.id);",
+                  "    console.log('Review created:', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n    \\\"product\\\": {{product_id}},\\n    \\\"rating\\\": 5,\\n    \\\"title\\\": \\\"Excellent produit!\\\",\\n    \\\"comment\\\": \\\"Très satisfait de mon achat.\\\"\\n}"
+            },
+            "url": "{{base_url}}/api/reviews/my/"
+          }
+        },
+        {
+          "name": "Avis d'un Produit",
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "exec": [
+                    "// If admin_token, client_token, or seller_token is needed, set Authorization dynamically",
+                    "if (pm.collectionVariables.get('client_token')) {",
+                    "    pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('client_token') });",
+                    "} else if (pm.collectionVariables.get('seller_token')) {",
+                    "    pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('seller_token') });",
+                    "} else if (pm.collectionVariables.get('admin_token')) {",
+                    "    pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('admin_token') });",
+                    "}"
+                  ]
+                }
+              }
+            ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/reviews/?product={{product_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. ADMINISTRATION",
+      "item": [
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('admin_token', jsonData.access);",
+                  "    console.log('Admin logged in');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n    \\\"username\\\": \\\"admin\\\",\\n    \\\"password\\\": \\\"Admin123!\\\"\\n}"
+            },
+            "url": "{{base_url}}/api/auth/login/"
+          }
+        },
+        {
+          "name": "Liste des Utilisateurs (Admin)",
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "exec": [
+                    "// Always set Authorization header dynamically with latest admin_token",
+                    "if (pm.collectionVariables.get('admin_token')) {",
+                    "    pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('admin_token') });",
+                    "}"
+                  ]
+                }
+              }
+            ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/users/"
+          }
+        },
+        {
+          "name": "Tous les Produits (Admin)",
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "exec": [
+                    "// Always set Authorization header dynamically with latest admin_token",
+                    "if (pm.collectionVariables.get('admin_token')) {",
+                    "    pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('admin_token') });",
+                    "}"
+                  ]
+                }
+              }
+            ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/products/"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "client_username",
+      "value": ""
+    },
+    {
+      "key": "seller_username",
+      "value": ""
+    },
+    {
+      "key": "client_token",
+      "value": ""
+    },
+    {
+      "key": "seller_token",
+      "value": ""
+    },
+    {
+      "key": "admin_token",
+      "value": ""
+    },
+    {
+      "key": "user_id",
+      "value": ""
+    },
+    {
+      "key": "seller_id",
+      "value": ""
+    },
+    {
+      "key": "seller_profile_id",
+      "value": ""
+    },
+    {
+      "key": "customer_profile_id",
+      "value": ""
+    },
+    {
+      "key": "admin_user_id",
+      "value": ""
+    },
+    {
+      "key": "product_id",
+      "value": ""
+    },
+    {
+      "key": "category_id",
+      "value": ""
+    },
+    {
+      "key": "order_id",
+      "value": ""
+    },
+    {
+      "key": "order_item_id",
+      "value": ""
+    },
+    {
+      "key": "address_id",
+      "value": ""
+    },
+    {
+      "key": "review_id",
+      "value": ""
+    },
+    {
+      "key": "return_id",
+      "value": ""
+    },
+    {
+      "key": "coupon_id",
+      "value": ""
+    },
+    {
+      "key": "payment_id",
+      "value": ""
+    },
+    {
+      "key": "refresh_token",
+      "value": ""
+    }
+  ]
+}
